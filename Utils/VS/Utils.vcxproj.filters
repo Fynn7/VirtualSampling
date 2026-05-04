@@ -185,10 +185,7 @@
     <ClInclude Include="..\..\VS\include\GL\wglew.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Z:\Documents\Papers\2026\Vis\Code\Utils\GLScreenshot.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="Z:\Documents\Papers\2026\Vis\Code\Utils\GLApp.h">
+    <ClInclude Include="..\GLScreenshot.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="..\GLTextureCube.h">

@@ -33,10 +33,10 @@
     <ClInclude Include="..\QVis.h" />
     <ClInclude Include="..\RenderModes.h" />
     <ClInclude Include="..\Volume.h" />
-    <ClInclude Include="Z:\Documents\Papers\2026\Vis\Code\Raycaster\Raycaster.h" />
-    <ClInclude Include="Z:\Documents\Papers\2026\Vis\Code\Raycaster\TransferFunction.h" />
-    <ClInclude Include="Z:\Documents\Papers\2026\Vis\Code\Raycaster\VolumeGenerator.h" />
-    <ClInclude Include="Z:\Documents\Papers\2026\Vis\Code\Raycaster\VolumeTransformer.h" />
+    <ClInclude Include="..\Raycaster.h" />
+    <ClInclude Include="..\TransferFunction.h" />
+    <ClInclude Include="..\VolumeGenerator.h" />
+    <ClInclude Include="..\VolumeTransformer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

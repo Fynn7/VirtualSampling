@@ -50,16 +50,16 @@
     <ClInclude Include="..\Clipper.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Z:\Documents\Papers\2026\Vis\Code\Raycaster\Raycaster.h">
+    <ClInclude Include="..\Raycaster.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Z:\Documents\Papers\2026\Vis\Code\Raycaster\TransferFunction.h">
+    <ClInclude Include="..\TransferFunction.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Z:\Documents\Papers\2026\Vis\Code\Raycaster\VolumeGenerator.h">
+    <ClInclude Include="..\VolumeGenerator.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Z:\Documents\Papers\2026\Vis\Code\Raycaster\VolumeTransformer.h">
+    <ClInclude Include="..\VolumeTransformer.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="..\RenderModes.h">
