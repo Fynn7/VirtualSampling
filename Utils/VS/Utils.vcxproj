@@ -81,8 +81,7 @@
     <ClInclude Include="..\..\VS\include\GL\glew.h" />
     <ClInclude Include="..\..\VS\include\GL\glxew.h" />
     <ClInclude Include="..\..\VS\include\GL\wglew.h" />
-    <ClInclude Include="Z:\Documents\Papers\2026\Vis\Code\Utils\GLApp.h" />
-    <ClInclude Include="Z:\Documents\Papers\2026\Vis\Code\Utils\GLScreenshot.h" />
+    <ClInclude Include="..\GLScreenshot.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
