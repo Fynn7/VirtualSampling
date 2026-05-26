@@ -113,6 +113,10 @@ protected:
 
   void closeWindow();
 
+protected:
+  void registerScriptCommands();
+  CommandResultCode runScriptFromString(const std::string& source);
+
 private:
   Mat4 p;
   Mat4 mv;
@@ -143,6 +147,7 @@ private:
 
   std::string scriptLogFile{"script.txt"};
   bool scriptRunning{false};
+  bool scriptCommandsRegistered{false};
 
 
   void shaderUpdate();

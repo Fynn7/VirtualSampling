@@ -867,11 +867,25 @@ static std::string getScriptFilename(const std::vector<std::string>& args) {
   return "";
 }
 
-void GLApp::initScript(const std::vector<std::string>& args) {
-  const std::string scriptName = getScriptFilename(args);
-  if (!scriptName.empty()) {
-    scriptRunning = interpreter.loadFromFile(scriptName) == CommandResultCode::success;
-    interpreter.registerCommand(
+CommandResultCode GLApp::runScriptFromString(const std::string& source) {
+  registerScriptCommands();
+  const CommandResultCode loadResult = interpreter.loadFromString(source);
+  if (loadResult != CommandResultCode::success) {
+    std::cerr << "Script load error: " << loadResult << "\n";
+    scriptRunning = false;
+    return loadResult;
+  }
+  scriptRunning = true;
+  return CommandResultCode::success;
+}
+
+void GLApp::registerScriptCommands() {
+  if (scriptCommandsRegistered) {
+    return;
+  }
+  scriptCommandsRegistered = true;
+
+  interpreter.registerCommand(
                                 "reset",
                                 [this]() {
                                   reset();
@@ -1069,12 +1083,19 @@ void GLApp::initScript(const std::vector<std::string>& args) {
                                   closeWindow();
                                 }
                                 );
-    interpreter.setUnknownCommandHandler(
-                                         [](const std::string &command,
-                                                const std::vector<std::string> &args) {
-                                                  std::cerr << "unknown command: " << command << "\n";
-                                                  return CommandResultCode::unknownCommand;
-                                                });
+  interpreter.setUnknownCommandHandler(
+                                       [](const std::string &command,
+                                              const std::vector<std::string> &args) {
+                                                std::cerr << "unknown command: " << command << "\n";
+                                                return CommandResultCode::unknownCommand;
+                                              });
+}
+
+void GLApp::initScript(const std::vector<std::string>& args) {
+  const std::string scriptName = getScriptFilename(args);
+  registerScriptCommands();
+  if (!scriptName.empty()) {
+    scriptRunning = interpreter.loadFromFile(scriptName) == CommandResultCode::success;
   } else {
     scriptRunning = false;
   }

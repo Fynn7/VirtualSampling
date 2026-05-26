@@ -2,7 +2,11 @@
 CC       ?= g++
 AR       ?= ar
 ARFLAGS  ?= rcs
+ifeq ($(OS),Windows_NT)
+OSTYPE   := Windows_NT
+else
 OSTYPE   := $(shell uname)
+endif
 
 # -------- Project sources --------
 SRC = Image.cpp bmp.cpp png.cpp GLApp.cpp GLBuffer.cpp \
@@ -57,13 +61,25 @@ $(TARGET_EM): $(OBJ_EM)
 	$(EMAR) $(ARFLAGS) $@ $^
 
 # -------- Compile rules (separate object dirs) --------
+ifeq ($(OS),Windows_NT)
+$(OBJDIR_NATIVE)/%.o: %.cpp
+	@if not exist $(subst /,\,$(OBJDIR_NATIVE)) mkdir $(subst /,\,$(OBJDIR_NATIVE))
+	$(CC) $(CFLAGS_NATIVE) $(INCLUDES_NATIVE) $< -o $@
+else
 $(OBJDIR_NATIVE)/%.o: %.cpp
 	@mkdir -p $(OBJDIR_NATIVE)
 	$(CC) $(CFLAGS_NATIVE) $(INCLUDES_NATIVE) $< -o $@
+endif
 
+ifeq ($(OS),Windows_NT)
+$(OBJDIR_EM)/%.o: %.cpp
+	@if not exist $(subst /,\,$(OBJDIR_EM)) mkdir $(subst /,\,$(OBJDIR_EM))
+	$(EMCC) $(CFLAGS_EM) $(INCLUDES_EM) $< -o $@
+else
 $(OBJDIR_EM)/%.o: %.cpp
 	@mkdir -p $(OBJDIR_EM)
 	$(EMCC) $(CFLAGS_EM) $(INCLUDES_EM) $< -o $@
+endif
 
 # -------- Housekeeping --------
 clean:

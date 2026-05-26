@@ -10,6 +10,14 @@ renderModes(makeRenderModes())
   registerCommands();
 }
 
+CommandResultCode Raycaster::runGraphicsScript(const std::string& source) {
+  return runScriptFromString(source);
+}
+
+void Raycaster::resetState() {
+  reset();
+}
+
 void Raycaster::updateVolume() {
   const RenderMode& renderMode = renderModes[currentRenderModeIndex];
   const VolumeMetaData& volumeMeta = volumes[currentVolumeIndex].getMeta();

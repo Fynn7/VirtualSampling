@@ -1,5 +1,9 @@
 CC=g++
+ifeq ($(OS),Windows_NT)
+OSTYPE := Windows_NT
+else
 OSTYPE := $(shell uname)
+endif
 
 # Native build output directory (non-Emscripten builds)
 OUTDIR := build
@@ -27,7 +31,11 @@ TARGET_PATH = $(OUTDIR)/$(TARGET)
 
 # Assets
 ASSET_DIRS := Shader Datasets Scripts
+ifeq ($(OS),Windows_NT)
+ASSET_FILES := $(wildcard Shader/*) $(wildcard Datasets/*) $(wildcard Scripts/*)
+else
 ASSET_FILES := $(shell find $(ASSET_DIRS) -type f 2>/dev/null)
+endif
 ASSETS_STAMP := $(OUTDIR)/.assets_copied
 
 # Emscripten/Web build output directory
@@ -54,7 +62,7 @@ EM_EXPORTED_FUNCTIONS := '["_main","_malloc","_free","_setDataset",\
 "_setMethod","_setConstantSampleCount","_setVirtualSamples",\
 "_setSamplingRateExp","_setTFParams","_setCustomTF","_setAlphaThreshold",\
 "_setTransformParams","_setBackground","_setUseOrtho",\
-"_setLevel"]'
+"_setLevel","_runGraphicsScript","_resetRaycaster"]'
 EM_RUNTIME_METHODS    := '["ccall"]'
 
 EM_LINK_FLAGS := \
@@ -118,24 +126,30 @@ utils_emscripten_release:
 	$(MAKE) -C $(UTILS_DIR) emscripten_release
 
 # ---- Emscripten builds (link against libutils_emscripten.a) ----
+ifeq ($(OS),Windows_NT)
+EM_WEB_MKDIR = @if not exist $(subst /,\,$(WEBOUTDIR)) mkdir $(subst /,\,$(WEBOUTDIR))
+EM_WEB_COPY  = @copy /Y index.html $(subst /,\,$(WEBOUTDIR))\ & copy /Y server.py $(subst /,\,$(WEBOUTDIR))\ >nul 2>&1
+else
+EM_WEB_MKDIR = @mkdir -p $(WEBOUTDIR)
+EM_WEB_COPY  = @if [ -n "$(strip $(WEB_COPY_FILES))" ]; then cp -f $(WEB_COPY_FILES) $(WEBOUTDIR)/; fi
+endif
+
 emscripten: utils_emscripten
-	@mkdir -p $(WEBOUTDIR)
+	$(EM_WEB_MKDIR)
 	$(EMCC) $(SRC) $(UTILS_EM_LIB) \
 		$(EM_INCLUDES) \
 		$(EM_LINK_FLAGS) \
 		-std=c++20 \
 		-O2 \
 		-o $(WEBHTML)
-	@# Copy static/support files into $(WEBOUTDIR)
-	@if [ -n "$(strip $(WEB_COPY_FILES))" ]; then cp -f $(WEB_COPY_FILES) $(WEBOUTDIR)/; fi
+	$(EM_WEB_COPY)
 
 emscripten_release: utils_emscripten_release
-	@mkdir -p $(WEBOUTDIR)
+	$(EM_WEB_MKDIR)
 	$(EMCC) $(SRC) $(UTILS_EM_LIB) \
 		$(EM_INCLUDES) \
 		$(EM_LINK_FLAGS) \
 		-std=c++20 \
 		-O3 -DNDEBUG \
 		-o $(WEBHTML)
-	@# Copy static/support files into $(WEBOUTDIR)
-	@if [ -n "$(strip $(WEB_COPY_FILES))" ]; then cp -f $(WEB_COPY_FILES) $(WEBOUTDIR)/; fi
+	$(EM_WEB_COPY)

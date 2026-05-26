@@ -1,4 +1,5 @@
 #include "Raycaster.h"
+#include "CommandInterpreter.h"
 
 #ifndef __EMSCRIPTEN__
 
@@ -112,6 +113,19 @@ std::shared_ptr<Raycaster> raycaster = nullptr;
     EMSCRIPTEN_KEEPALIVE void setBackground(float r, float g, float b, float a) {
       if (raycaster) {
         raycaster->setBackground(r,g,b,a);
+      }
+    }
+
+    EMSCRIPTEN_KEEPALIVE int runGraphicsScript(const char* src) {
+      if (!raycaster || !src) {
+        return static_cast<int>(CommandResultCode::invalidArguments);
+      }
+      return static_cast<int>(raycaster->runGraphicsScript(std::string(src)));
+    }
+
+    EMSCRIPTEN_KEEPALIVE void resetRaycaster() {
+      if (raycaster) {
+        raycaster->resetState();
       }
     }
 

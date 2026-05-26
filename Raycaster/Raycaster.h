@@ -145,6 +145,8 @@ public:
   void setUseOrtho(bool newUseOrtho);
   void setUseNNFilter(bool useNNFilter);
   void computeAllPrefilter();
+  CommandResultCode runGraphicsScript(const std::string& source);
+  void resetState();
 
 private:
   virtual void reset() override;
