@@ -49,3 +49,9 @@ Debug/
 **/VS/*.glsl
 **/VS/*.lz4
 **/VS/*.dat
+
+# Local build outputs
+Raycaster/VS/x64/
+Raycaster/web/
+Raycaster/VS/Raycaster/
+Utils/VS/x64/
