@@ -133,6 +133,7 @@ public:
   uint32_t getRendermode() const {return currentRenderModeIndex;}
   void setRendermode(uint32_t index);
   void setVolume(uint32_t index);
+  CommandResultCode loadVolumePath(const std::string& datPath);
   void setConstantSampleCount(bool value);
   void setVirtualSamples(uint32_t index);
   void setSampling(float value);

@@ -50,6 +50,11 @@ void Raycaster::registerCommands() {
     return CommandResultCode::success;
   }
   );
+  interpreter.registerCommand("loadvolume",
+  [this](const std::string& path) -> CommandResultCode {
+    return loadVolumePath(path);
+  }
+  );
   interpreter.registerCommand("settffile",
   [this](const std::string& filename) {
     loadTFFile(filename);

@@ -290,6 +290,21 @@ void Raycaster::setVolume(uint32_t index) {
   updateTitle();
 }
 
+CommandResultCode Raycaster::loadVolumePath(const std::string& datPath) {
+  if (datPath.empty() || datPath.find(' ') != std::string::npos) {
+    return CommandResultCode::invalidArguments;
+  }
+  try {
+    QVis qvis{datPath};
+    volumes.emplace_back(VolumeListElement{std::move(qvis.volume)});
+    setVolume(uint32_t(volumes.size() - 1));
+    return CommandResultCode::success;
+  } catch (const QVisFileException& e) {
+    std::cout << "loadvolume failed: " << e.what() << std::endl;
+    return CommandResultCode::invalidArguments;
+  }
+}
+
 void Raycaster::setConstantSampleCount(bool value) {
   constantSampleCount = value;
 }

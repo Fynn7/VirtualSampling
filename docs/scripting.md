@@ -191,6 +191,10 @@ These commands are registered by `Raycaster` itself.
 
 - `setvolume <index>`
   Select the active dataset.
+- `loadvolume <path.dat>`
+  Load a QVis dataset from an absolute path (forward slashes; no spaces in the
+  path), append it to the volume list, and select the new index. The `.dat` file
+  must reference a sibling raw/lz4 object via `ObjectFileName`.
 - `setmethod <index>`
   Select the render mode.
 - `setrate <rate>`
