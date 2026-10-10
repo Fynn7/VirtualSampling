@@ -1,4 +1,10 @@
 void Raycaster::registerCommands() {
+  interpreter.registerCommand("setclipbounds", [this](float x0,float x1,float y0,float y1,float z0,float z1) {
+    return setClipBounds(x0,x1,y0,y1,z0,z1);
+  });
+  interpreter.registerCommand("resetclipbounds", [this]() {
+    return setClipBounds(0,voxelCount.x,0,voxelCount.y,0,voxelCount.z);
+  });
   interpreter.registerCommand("constantSampleCount",
   [this](bool enabled) {
     setConstantSampleCount(enabled);

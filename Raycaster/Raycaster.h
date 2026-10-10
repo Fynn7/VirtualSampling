@@ -187,6 +187,7 @@ private:
 
   Vec3 minBounds;
   Vec3 maxBounds;
+  bool clipUsesVoxelBounds = false;
   Vec3 clipBoxSize{1,1,1};
   Vec3 clipBoxShift{0,0,0};
   float oversampling;
@@ -226,6 +227,8 @@ private:
 
   void updateVolume();
   void registerCommands();
+  CommandResultCode setClipBounds(float x0, float x1, float y0, float y1, float z0, float z1);
+  void resetClipBounds();
   void updateMatrices();
   void clipCubeToNearplane();
   void updateTransferFunction();

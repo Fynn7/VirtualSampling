@@ -1,5 +1,6 @@
 #include "Raycaster.h"
 #include "Clipper.h"
+#include <cmath>
 
 #include "RaycasterScript.inc"
 
@@ -16,6 +17,28 @@ CommandResultCode Raycaster::runGraphicsScript(const std::string& source) {
 
 void Raycaster::resetState() {
   reset();
+}
+
+CommandResultCode Raycaster::setClipBounds(float x0, float x1, float y0, float y1, float z0, float z1) {
+  const float lows[3] = {x0,y0,z0}, highs[3] = {x1,y1,z1};
+  const float counts[3] = {voxelCount.x,voxelCount.y,voxelCount.z};
+  for (int axis=0; axis<3; ++axis) {
+    if (!std::isfinite(lows[axis]) || !std::isfinite(highs[axis]) ||
+        counts[axis]<=0 || lows[axis]<0 || highs[axis]>counts[axis] || lows[axis]>=highs[axis])
+      return CommandResultCode::invalidArguments;
+  }
+  clipBoxSize = Vec3{(x1-x0)/voxelCount.x,(y1-y0)/voxelCount.y,(z1-z0)/voxelCount.z};
+  clipUsesVoxelBounds = true;
+  clipBoxShift = Vec3{(x0+x1)/(2*voxelCount.x)-0.5f,
+                     (y0+y1)/(2*voxelCount.y)-0.5f,
+                     (z0+z1)/(2*voxelCount.z)-0.5f};
+  updateMatrices();
+  return CommandResultCode::success;
+}
+void Raycaster::resetClipBounds() {
+  clipUsesVoxelBounds = false;
+  clipBoxSize = Vec3{1,1,1};
+  clipBoxShift = Vec3{0,0,0};
 }
 
 void Raycaster::updateVolume() {
@@ -64,12 +87,13 @@ void Raycaster::updateMatrices() {
     projection = Mat4{ Mat4::perspective(45.0f, fbDim.aspect(), near, 100.0f) };
   }
 
+
   clipBoxShift = Vec3::maxV((Vec3{1,1,1}-clipBoxSize)*-0.5,Vec3::minV((Vec3{1,1,1}-clipBoxSize)*0.5, clipBoxShift));
   const Vec3 voxelShift = (voxelCount.x > 0 &&
                            voxelCount.y > 0 &&
                            voxelCount.z > 0) ? Vec3{0.5f}/voxelCount : Vec3{0,0,0};
 
-  clipBox = Mat4::translation(clipBoxShift-voxelShift) * Mat4::scaling(clipBoxSize);
+  clipBox = Mat4::translation(clipBoxShift-(clipUsesVoxelBounds ? Vec3{0,0,0} : voxelShift)) * Mat4::scaling(clipBoxSize);
   minBounds = clipBox * Vec3{-0.5,-0.5,-0.5} + 0.5f;
   maxBounds = clipBox * Vec3{ 0.5, 0.5, 0.5} + 0.5f;
 
@@ -279,6 +303,7 @@ void Raycaster::setRendermode(uint32_t index) {
 }
 
 void Raycaster::setVolume(uint32_t index) {
+  resetClipBounds();
   const uint32_t clampedIndex = index % volumes.size();
 
   if (volumeCallback && clampedIndex != currentVolumeIndex) {
