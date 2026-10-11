@@ -1,4 +1,6 @@
 void Raycaster::registerCommands() {
+  interpreter.registerCommand("loadmask",[this](const std::string& path,float contextAlpha){return loadMaskPath(path,contextAlpha);});
+  interpreter.registerCommand("clearmask",[this](){maskEnabled=false;return CommandResultCode::success;});
   interpreter.registerCommand("setclipbounds", [this](float x0,float x1,float y0,float y1,float z0,float z1) {
     return setClipBounds(x0,x1,y0,y1,z0,z1);
   });
@@ -40,6 +42,7 @@ void Raycaster::registerCommands() {
   );
   interpreter.registerCommand("setmethod",
   [this](uint32_t i) -> CommandResultCode {
+    if(maskEnabled && i!=0) return CommandResultCode::invalidArguments;
     if (i >= renderModes.size()) {
       return CommandResultCode::invalidArguments;
     }

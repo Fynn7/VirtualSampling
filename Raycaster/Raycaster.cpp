@@ -1,6 +1,8 @@
 #include "Raycaster.h"
 #include "Clipper.h"
 #include <cmath>
+#include <fstream>
+#include <algorithm>
 
 #include "RaycasterScript.inc"
 
@@ -17,6 +19,22 @@ CommandResultCode Raycaster::runGraphicsScript(const std::string& source) {
 
 void Raycaster::resetState() {
   reset();
+}
+
+CommandResultCode Raycaster::loadMaskPath(const std::string& path, float contextAlpha) {
+  if(currentRenderModeIndex != 0 || volumes[currentVolumeIndex].getLevel()!=0 ||
+     !std::isfinite(contextAlpha) || contextAlpha<0 || contextAlpha>1)
+    return CommandResultCode::invalidArguments;
+  const size_t count=size_t(voxelCount.x)*size_t(voxelCount.y)*size_t(voxelCount.z);
+  if(!count || count>16000000) return CommandResultCode::invalidArguments;
+  std::ifstream input(path,std::ios::binary | std::ios::ate);
+  if(!input || input.tellg()!=std::streamoff(count)) return CommandResultCode::invalidArguments;
+  std::vector<uint8_t> data(count);input.seekg(0);input.read(reinterpret_cast<char*>(data.data()),count);
+  if(!input || std::any_of(data.begin(),data.end(),[](uint8_t v){return v>1;})) return CommandResultCode::invalidArguments;
+  for(auto& v:data)v=v?255:0;
+  maskTex.setData(data.data(),uint32_t(voxelCount.x),uint32_t(voxelCount.y),uint32_t(voxelCount.z),1,GLDataType::BYTE);
+  maskContextAlpha=contextAlpha;maskEnabled=true;
+  return CommandResultCode::success;
 }
 
 CommandResultCode Raycaster::setClipBounds(float x0, float x1, float y0, float y1, float z0, float z1) {
@@ -140,6 +158,7 @@ void Raycaster::updateTransferFunction() {
 }
 
 void Raycaster::reset() {
+  maskEnabled=false;
   useOrtho = false;
   useNNFilter = false;
   rotation = Mat4{};
@@ -226,6 +245,11 @@ void Raycaster::setupShader() {
 
   currentProgram.setUniform("voxelCount", voxelCount);
   currentProgram.setUniform("alphaThreshold",alphaThreshold);
+  if(currentRenderModeIndex==0) {
+    currentProgram.setUniform("maskEnabled",int(maskEnabled));
+    currentProgram.setUniform("maskContextAlpha",maskContextAlpha);
+    if(maskEnabled)currentProgram.setTexture("targetMask",maskTex,3);
+  }
 
   switch (renderMode.volumeType) {
     case VolumeType::RAW:
@@ -290,6 +314,7 @@ void Raycaster::draw() {
 }
 
 void Raycaster::setRendermode(uint32_t index) {
+  if(maskEnabled && index!=0) return;
   const uint32_t clampedIndex = index % renderModes.size();
 
   if (modeCallback && clampedIndex != currentRenderModeIndex) {
@@ -303,6 +328,7 @@ void Raycaster::setRendermode(uint32_t index) {
 }
 
 void Raycaster::setVolume(uint32_t index) {
+  maskEnabled=false;
   resetClipBounds();
   const uint32_t clampedIndex = index % volumes.size();
 
@@ -387,6 +413,7 @@ void Raycaster::setTransformParams(const std::string& transformStr) {
 }
 
 bool Raycaster::setLevel(size_t level) {
+  if(maskEnabled && level!=0) return false;
   const size_t prevLevel = volumes[currentVolumeIndex].getLevel();
 
   if (!volumes[currentVolumeIndex].setLevel(level)) return false;

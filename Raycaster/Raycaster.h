@@ -229,6 +229,10 @@ private:
   void registerCommands();
   CommandResultCode setClipBounds(float x0, float x1, float y0, float y1, float z0, float z1);
   void resetClipBounds();
+  CommandResultCode loadMaskPath(const std::string& path, float contextAlpha);
+  bool maskEnabled = false;
+  float maskContextAlpha = 0;
+  GLTexture3D maskTex{GL_NEAREST, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE};
   void updateMatrices();
   void clipCubeToNearplane();
   void updateTransferFunction();
