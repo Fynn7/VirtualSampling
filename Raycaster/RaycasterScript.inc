@@ -92,7 +92,8 @@ void Raycaster::registerCommands() {
   );
   interpreter.registerCommand("setLevel",
   [this](uint32_t l) {
-    setLevel(l);
+    if(!setLevel(l)) return CommandResultCode::invalidArguments;
+    return CommandResultCode::success;
   }
   );
   interpreter.registerCommand("setrotation",
